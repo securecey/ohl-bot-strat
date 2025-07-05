@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>OHL Strategy Bot</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>📈 OHL Strategy Bot</h1>
+    <div class="button-group">
+      <form method="POST">
+        <button type="button" onclick="addRow()">+ Add Row</button>
+        <button type="button" onclick="clearTable()">🗑 Clear</button>
+        <button type="submit">🚀 Run Strategy</button>
+      </form>
+      <a href="/analyze" class="analyze-btn">📊 Analyze Market</a>
+    </div>
+    <form method="POST">
+      <div class="responsive-table">
+        <table id="inputTable">
+          <thead>
+            <tr>
+              <th>Date</th><th>Open</th><th>High</th><th>Low</th><th>Close</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><input type="date" name="date" required /></td>
+              <td><input type="number" name="open" step="0.01" required /></td>
+              <td><input type="number" name="high" step="0.01" required /></td>
+              <td><input type="number" name="low" step="0.01" required /></td>
+              <td><input type="number" name="close" step="0.01" required /></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </form>
+    {% if results %}
+    <h2>{{ '📊 Top 5 NSE Picks' if auto else '📄 Strategy Results' }}</h2>
+    <div class="responsive-table">
+      <table>
+        <thead>
+          <tr>
+            {% if auto %}<th>Stock</th>{% else %}<th>Date</th>{% endif %}
+            <th>Open</th><th>High</th><th>Low</th><th>Close</th>
+            {% if auto %}<th>Volume</th>{% endif %}
+            <th>Signal</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in results %}
+          <tr>
+            {% if auto %}<td>{{ row.stock }}</td>{% else %}<td>{{ row.date }}</td>{% endif %}
+            <td>{{ row.open }}</td><td>{{ row.high }}</td><td>{{ row.low }}</td><td>{{ row.close }}</td>
+            {% if auto %}<td>{{ row.volume }}</td>{% endif %}
+            <td class="signal {{ row.signal|lower }}"><strong>{{ row.signal }}</strong></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <a href="/download" class="download-btn">📥 Download CSV</a>
+    {% endif %}
+  </div>
+  <script>
+    function addRow() {
+      const table = document.querySelector("#inputTable tbody");
+      const newRow = table.rows[0].cloneNode(true);
+      newRow.querySelectorAll("input").forEach(input => input.value = "");
+      table.appendChild(newRow);
+    }
+    function clearTable() {
+      const table = document.querySelector("#inputTable tbody");
+      table.innerHTML = "";
+      addRow();
+    }
+  </script>
+</body>
+</html>
